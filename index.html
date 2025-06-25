@@ -18,36 +18,25 @@
     <video id="video0" src="./assets/video0.webm" autoplay loop muted playsinline></video>
     <video id="video1" src="./assets/video1.webm" autoplay loop muted playsinline></video>
 
-    <script>
-      const start = async () => {
-        const mindarThree = new window.MINDAR.IMAGE.MindARThree({
-          container: document.querySelector("#container"),
-          imageTargetSrc: "./assets/target.mind"
-        });
-        const { renderer, scene, camera } = mindarThree;
+   <script>
+window.addEventListener("load", async () => {
+  const mindarThree = new window.MINDAR.IMAGE.MindARThree({
+    container: document.querySelector("#container"),
+    imageTargetSrc: "./assets/target.mind"
+  });
+  const { renderer, scene, camera } = mindarThree;
 
-        await mindarThree.start();
-        renderer.setAnimationLoop(() => {
-          renderer.render(scene, camera);
-        });
+  const video = document.getElementById("video0"); // 檢查 HTML 影片 id 是否正確
+  const texture = new THREE.VideoTexture(video);
+  const plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(1, 0.5625),
+    new THREE.MeshBasicMaterial({ map: texture, transparent: true })
+  );
+  mindarThree.addAnchor(0).group.add(plane);
 
-        // 每個 target index 建立一個 anchor 和影片
-        const videos = ["video0", "video1"];
-
-        videos.forEach((id, index) => {
-          const video = document.getElementById(id);
-          const texture = new THREE.VideoTexture(video);
-          const geometry = new THREE.PlaneGeometry(1, 0.5625); // 調整比例為 16:9
-          const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-
-          const plane = new THREE.Mesh(geometry, material);
-
-          const anchor = mindarThree.addAnchor(index);
-          anchor.group.add(plane);
-        });
-      };
-
-      start();
-    </script>
+  await mindarThree.start();
+  renderer.setAnimationLoop(() => renderer.render(scene, camera));
+});
+</script>
   </body>
 </html>
